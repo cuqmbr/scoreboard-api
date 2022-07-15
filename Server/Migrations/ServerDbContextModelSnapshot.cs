@@ -19,9 +19,8 @@ namespace Server.Migrations
 
             modelBuilder.Entity("DatabaseModels.ScoreboardRecord", b =>
                 {
-                    b.Property<uint>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Username")
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("PostTime")
                         .HasColumnType("TEXT");
@@ -29,10 +28,7 @@ namespace Server.Migrations
                     b.Property<int>("Score")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Username")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
+                    b.HasKey("Username");
 
                     b.ToTable("Scoreboard");
                 });
