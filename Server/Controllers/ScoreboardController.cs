@@ -1,33 +1,35 @@
-using DatabaseModels;
+using System.Data;
+using DatabaseModels.Plain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
+using Server.Services;
 
 namespace Server.Controllers;
 
-[Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class ScoreboardController : ControllerBase
 {
-    private readonly ServerDbContext _context;
+    private readonly ScoreboardService _sbService;
     
-    public ScoreboardController(ServerDbContext context)
+    public ScoreboardController(ScoreboardService sbService)
     {
-        _context = context;
+        _sbService = sbService;
     }
     
-    // GET: api/Scoreboard
+    // GET: /scoreboard
     [HttpGet]
     public async Task<ActionResult<ScoreboardRecord[]>> Get()
     {
-        return await _context.Scoreboard.ToArrayAsync();
+        return await _sbService.GetScoreboard();
     }
 
-    // GET: api/Scoreboard/cuqmbr
+    // GET: /scoreboard/cuqmbr
     [HttpGet("{username}", Name = "Get")]
     public async Task<ActionResult<ScoreboardRecord>> Get(string username)
     {
-        var sbRecord = await _context.Scoreboard.FirstOrDefaultAsync(sbr => sbr.Username == username);
+        var sbRecord = await _sbService.GetUserHighScore(username);
 
         if (sbRecord == null)
         {
@@ -37,46 +39,50 @@ public class ScoreboardController : ControllerBase
         return sbRecord;
     }
 
-    // POST: api/Scoreboard
+    // POST: /scoreboard
     [HttpPost]
     public async Task<ActionResult> Post([FromBody] ScoreboardRecord sbRecord)
     {
-        await _context.AddAsync(sbRecord);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(Get), new {sbRecord.Username}, sbRecord);
+        await _sbService.AddUserHighScore(sbRecord);
+        return CreatedAtAction(nameof(Get), new {sbRecord.User}, sbRecord);
     }
-
-    // PUT: api/Scoreboard/cuqmbr
-    [HttpPut("{username}")]
-    public async Task<ActionResult> Put(string username, [FromBody] ScoreboardRecord sbRecord)
+    
+    // PUT: /scoreboard/id
+    [HttpPut("{id}", Name = "Put")]
+    public async Task<ActionResult<ScoreboardRecord>> Put(int id, [FromBody] ScoreboardRecord sbRecord)
     {
-        if (username != sbRecord.Username)
+        if (id != sbRecord.Id)
         {
             return BadRequest();
         }
 
-        _context.Entry(sbRecord).State = EntityState.Modified;
-
         try
         {
-            await _context.SaveChangesAsync();
+            await _sbService.UpdateScoreboardRecord(sbRecord);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (DBConcurrencyException)
         {
-            if (!await ScoreboardRecordExists(sbRecord.Username))
+            if (!await _sbService.ScoreboardRecordExists(id))
             {
                 return NotFound();
             }
-
+            
             throw;
         }
 
         return NoContent();
     }
-
-    private async Task<bool> ScoreboardRecordExists(string username)
+    
+    // DELETE: /scoreboard/id
+    [HttpDelete("{id}", Name = "Delete")]
+    public async Task<ActionResult> Delete(int id)
     {
-        return await _context.Scoreboard.AnyAsync(sbr => sbr.Username == username);
+        if (!await _sbService.ScoreboardRecordExists(id))
+        {
+            return NotFound();
+        }
+
+        await _sbService.DeleteScoreboardRecord(id);
+        return NoContent();
     }
 }
