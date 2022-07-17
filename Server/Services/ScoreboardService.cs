@@ -8,15 +8,17 @@ namespace Server.Services;
 public class ScoreboardService
 {
     private readonly ServerDbContext _dbContext;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ScoreboardService(ServerDbContext dbContext)
+    public ScoreboardService(ServerDbContext dbContext, IHttpContextAccessor httpContextAccessor)
     {
         _dbContext = dbContext;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     // GET
     
-    public async Task<ScoreboardRecordDto[]> GetScoreboard()
+    public async Task<(bool success, string content, ScoreboardRecordDto[])> GetScoreboard()
     {
         var sbRecords = await _dbContext.Scoreboard
             .Include(sbr => sbr.User)
@@ -26,40 +28,59 @@ public class ScoreboardService
         sbRecords = sbRecords.DistinctBy(sbr => sbr.User.Id).ToList();
 
         var dto = new List<ScoreboardRecordDto>(sbRecords.Count);
-
         foreach (var sbr in sbRecords)
         {
             dto.Add(sbr.ToDto());
         }
         
-        return dto.ToArray();
+        return (true, "", dto.ToArray());
     }
 
-    public async Task<ScoreboardRecordDto?> GetUserHighScore(string username)
+    public async Task<(bool success, string content, ScoreboardRecordDto? sbRecordDto)> GetUserHighScore(string username)
     {
         var userScoreboardRecords = await _dbContext.Scoreboard
             .Include(sbr => sbr.User)
             .Where(sbr => sbr.User.Username == username)
             .ToListAsync();
 
-        return userScoreboardRecords.MaxBy(sbr => sbr.Score)?.ToDto();
+        if (userScoreboardRecords.Count == 0)
+        {
+            return (false, "Username invalid or scoreboard records are absent", null);
+        }
+
+        return (true, "", userScoreboardRecords.MaxBy(sbr => sbr.Score)?.ToDto());
     }
 
     // POST
     
-    public async Task AddUserHighScore(ScoreboardRecordDto sbRecordDto)
+    public async Task<(bool success, string content)> AddUserHighScore(ScoreboardRecordDto sbRecordDto)
     {
+        if (sbRecordDto.User.Id != Int32.Parse(_httpContextAccessor.HttpContext!.User.Claims.First(c => c.Type == "Id").Value))
+        {
+            return (false, "User id is not yours");
+        }
+
+        var sbHighScoreRecordDto = (await GetUserHighScore(sbRecordDto.User.Username)).sbRecordDto;
+        
+        if (sbHighScoreRecordDto != null &&
+            sbRecordDto.Score <= sbHighScoreRecordDto.Score)
+        {
+            return (false, $"You can not post score lower than {sbHighScoreRecordDto.Score}");
+        }
+
         var sbRecord = new ScoreboardRecord {
             Score = sbRecordDto.Score,
             PostTime = sbRecordDto.PostTime
         };
         var dbUser = await _dbContext.Users.FindAsync(sbRecordDto.User.Id);
-        sbRecord.User = dbUser;
+        sbRecord.User = dbUser!;
         
         await _dbContext.AddAsync(sbRecord);
         await _dbContext.SaveChangesAsync();
         
         sbRecordDto.Id = _dbContext.ChangeTracker.Entries<ScoreboardRecord>().First().Entity.Id;
+
+        return (true, "");
     }
     
     // PUT

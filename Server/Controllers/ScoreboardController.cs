@@ -1,11 +1,15 @@
+using System.Security.Claims;
 using DatabaseModels.DataTransferObjets;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Server.Services;
 
 namespace Server.Controllers;
 
-[Route("[controller]")]
+[Authorize]
+[Route("api/[controller]")]
 [ApiController]
 public class ScoreboardController : ControllerBase
 {
@@ -18,35 +22,57 @@ public class ScoreboardController : ControllerBase
     
     // GET: /scoreboard
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<ScoreboardRecordDto[]>> Get()
     {
-        return await _sbService.GetScoreboard();
-    }
+        var (success, content, sbRecordsDto) = await _sbService.GetScoreboard();
 
-    // GET: /scoreboard/cuqmbr
-    [HttpGet("{username}", Name = "Get")]
-    public async Task<ActionResult<ScoreboardRecordDto>> Get(string username)
-    {
-        var sbRecordDto = await _sbService.GetUserHighScore(username);
-
-        if (sbRecordDto == null)
+        if (!success)
         {
             return NotFound();
         }
         
-        return sbRecordDto;
+        return sbRecordsDto;
+    }
+
+    // GET: /scoreboard/cuqmbr
+    [HttpGet("{username}", Name = "Get")]
+    [AllowAnonymous]
+    public async Task<ActionResult<ScoreboardRecordDto>> Get(string username)
+    {
+        var (success, content, sbRecordDto) = await _sbService.GetUserHighScore(username);
+
+        if (!success)
+        {
+            return NotFound(content);
+        }
+        
+        return sbRecordDto!;
     }
 
     // POST: /scoreboard
     [HttpPost]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Default, Administrator")]
     public async Task<ActionResult> Post([FromBody] ScoreboardRecordDto sbRecordDto)
     {
-        await _sbService.AddUserHighScore(sbRecordDto);
+        var (success, content) = await _sbService.AddUserHighScore(sbRecordDto);
+
+        if (!success && content.Equals("User id is not yours"))
+        {
+            return Forbid();
+        }
+
+        if (!success && content.Contains("You can not post score lower than"))
+        {
+            return BadRequest(content);
+        }
+        
         return CreatedAtAction(nameof(Get), new {sbRecordDto}, sbRecordDto);
     }
     
     // PUT: /scoreboard/id
     [HttpPut("{id}", Name = "Put")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Administrator")]
     public async Task<ActionResult> Put(int id, [FromBody] ScoreboardRecordDto sbRecordDto)
     {
         if (id != sbRecordDto.Id)
@@ -73,6 +99,7 @@ public class ScoreboardController : ControllerBase
     
     // DELETE: /scoreboard/id
     [HttpDelete("{id}", Name = "Delete")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Administrator")]
     public async Task<ActionResult> Delete(int id)
     {
         if (!await _sbService.ScoreboardRecordExists(id))

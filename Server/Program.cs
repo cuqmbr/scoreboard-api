@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Server.Data;
+using Server.Models;
 using Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(o => {
     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 });
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o => {
     o.TokenValidationParameters = new TokenValidationParameters {
@@ -57,7 +59,13 @@ builder.Services.AddSwaggerGen(o => {
 
 builder.Services.AddDbContext<ServerDbContext>(o => 
     o.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddScoped<ScoreboardService>();
+builder.Services.AddScoped<AuthenticationService>();
+
+var jwt = new Jwt();
+builder.Configuration.Bind("Jwt", jwt);
+builder.Services.AddSingleton(jwt);
 
 var app = builder.Build();
 
