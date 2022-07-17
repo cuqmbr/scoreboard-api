@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\DatabaseModels\DatabaseModels.csproj" />
+      <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
     </ItemGroup>
 
 </Project>

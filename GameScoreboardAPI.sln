@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{7329EAAE-16BE-4A9C-8F8A-AF1913813129}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseModels", "DatabaseModels\DatabaseModels.csproj", "{1F02ACB1-88BD-4A1F-A481-CB8B9714711B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedModels", "SharedModels\SharedModels.csproj", "{1F02ACB1-88BD-4A1F-A481-CB8B9714711B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -17,7 +17,7 @@ namespace Server.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.6");
 
-            modelBuilder.Entity("DatabaseModels.Plain.ScoreboardRecord", b =>
+            modelBuilder.Entity("SharedModels.Plain.ScoreboardRecord", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -39,7 +39,7 @@ namespace Server.Migrations
                     b.ToTable("Scoreboard");
                 });
 
-            modelBuilder.Entity("DatabaseModels.Plain.User", b =>
+            modelBuilder.Entity("SharedModels.Plain.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,9 +66,9 @@ namespace Server.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("DatabaseModels.Plain.ScoreboardRecord", b =>
+            modelBuilder.Entity("SharedModels.Plain.ScoreboardRecord", b =>
                 {
-                    b.HasOne("DatabaseModels.Plain.User", "User")
+                    b.HasOne("SharedModels.Plain.User", "User")
                         .WithMany("ScoreboardRecords")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -77,7 +77,7 @@ namespace Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DatabaseModels.Plain.User", b =>
+            modelBuilder.Entity("SharedModels.Plain.User", b =>
                 {
                     b.Navigation("ScoreboardRecords");
                 });
