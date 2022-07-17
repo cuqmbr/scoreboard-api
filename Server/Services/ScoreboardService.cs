@@ -78,7 +78,7 @@ public class ScoreboardService
         await _dbContext.AddAsync(sbRecord);
         await _dbContext.SaveChangesAsync();
         
-        sbRecordDto.Id = _dbContext.ChangeTracker.Entries<ScoreboardRecord>().First().Entity.Id;
+        sbRecordDto.Id = _dbContext.ChangeTracker.Entries<ScoreboardRecord>().Last().Entity.Id;
 
         return (true, "");
     }
