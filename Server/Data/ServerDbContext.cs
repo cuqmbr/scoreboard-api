@@ -1,4 +1,4 @@
-using DatabaseModels.Plain;
+using DatabaseModels.InitialObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Server.Data;
