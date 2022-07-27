@@ -63,7 +63,8 @@ public class AuthenticationService
     {
         var subject = new ClaimsIdentity(new[] {
             new Claim("Id", user.Id.ToString()),
-            new Claim(ClaimTypes.Role, user.Role),
+            new Claim("Username", user.Username),
+            new Claim(ClaimTypes.Role, user.Role)
         });
 
         return subject;
