@@ -59,12 +59,6 @@ public class AuthenticationService
         return (true, GenerateJwtToken(AssembleClaimsIdentity(user)));
     }
 
-    public async Task<int> GetIdByUsername(string username)
-    {
-        var dbUser = await _dbContext.Users.FirstAsync(u => u.Username == username);
-        return dbUser.Id;
-    }
-    
     private ClaimsIdentity AssembleClaimsIdentity(User user)
     {
         var subject = new ClaimsIdentity(new[] {

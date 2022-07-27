@@ -41,7 +41,6 @@ public class AuthenticationController : ControllerBase
             return BadRequest("Username or password is incorrect.");
         }
 
-        var userId = await _authenticationService.GetIdByUsername(request.Username);
-        return Ok(new AuthenticationResponse { UserId = userId, Token = content } );
+        return Ok(new AuthenticationResponse { Token = content } );
     }
 }
