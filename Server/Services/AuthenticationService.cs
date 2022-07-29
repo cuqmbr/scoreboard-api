@@ -62,8 +62,8 @@ public class AuthenticationService
     private ClaimsIdentity AssembleClaimsIdentity(User user)
     {
         var subject = new ClaimsIdentity(new[] {
-            new Claim("Id", user.Id.ToString()),
-            new Claim("Username", user.Username),
+            new Claim("id", user.Id.ToString()),
+            new Claim("username", user.Username),
             new Claim(ClaimTypes.Role, user.Role)
         });
 

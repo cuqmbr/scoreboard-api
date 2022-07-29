@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Server.Controllers;
 
-[Route("auth")]
+[Route("api/auth")]
 [ApiController]
 public class AuthenticationController : ControllerBase
 {

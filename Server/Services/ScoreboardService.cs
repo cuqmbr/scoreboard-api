@@ -55,7 +55,7 @@ public class ScoreboardService
     
     public async Task<(bool success, string content)> AddUserHighScore(ScoreboardRecordDto sbRecordDto)
     {
-        if (sbRecordDto.User.Id != Int32.Parse(_httpContextAccessor.HttpContext!.User.Claims.First(c => c.Type == "Id").Value))
+        if (sbRecordDto.User.Id != Int32.Parse(_httpContextAccessor.HttpContext!.User.Claims.First(c => c.Type == "id").Value))
         {
             return (false, "User id is not yours");
         }
