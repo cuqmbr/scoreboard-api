@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="cp ./bin/Release/net6.0/SharedModels.dll /home/danil/Unity/Projects/untiteled-mobile-game/Assets/Imported\ Assets/Plugins/SharedModels.dll" />
+      <Exec Command="cp ./bin/Release/net6.0/SharedModels.dll /home/danil/Unity/Projects/untiteled-mobile-game/Assets/Imported\ Assets/SharedModels.dll" />
     </Target>
 
 </Project>

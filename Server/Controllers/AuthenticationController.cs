@@ -24,7 +24,7 @@ public class AuthenticationController : ControllerBase
         
         if (!success)
         {
-            return BadRequest(content);
+            return BadRequest(new AuthenticationResponse {IsError = true, ErrorMessage = content} );
         }
 
         return await Login(request);
@@ -38,7 +38,7 @@ public class AuthenticationController : ControllerBase
         
         if (!success)
         {
-            return BadRequest("Username or password is incorrect.");
+            return BadRequest(new AuthenticationResponse {IsError = true, ErrorMessage = "Username or password is incorrect."});
         }
 
         return Ok(new AuthenticationResponse { Token = content } );
