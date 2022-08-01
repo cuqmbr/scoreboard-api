@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using DatabaseModels.InitialObjects;
 using DatabaseModels.Requests;
 using Microsoft.EntityFrameworkCore;
@@ -24,9 +25,19 @@ public class AuthenticationService
 
     public async Task<(bool success, string content)> Register(AuthenticationRequest request)
     {
+        if (!IsValidUsername(request.Username, out string usrErr))
+        {
+            return (false, usrErr);
+        }
+        
         if (await _dbContext.Users.AnyAsync(u => u.Username == request.Username))
         {
             return (false, "Username is taken.");
+        }
+
+        if (!IsValidPassword(request.Password, out string pwdErr))
+        {
+            return (false, pwdErr);
         }
 
         var user = new User {
@@ -108,5 +119,62 @@ public class AuthenticationService
         hashGenerator.IterationCount = 10101;
         var bytes = hashGenerator.GetBytes(24);
         return Convert.ToBase64String(bytes);
+    }
+
+    private bool IsValidUsername(string username, out string validationError)
+    {
+        if (username.Contains(" "))
+        {
+            validationError = "Username must be a one word.";
+            return false;
+        }
+
+        if (username.Length < 3)
+        {
+            validationError = "Username must be minimum 3 characters long.";
+            return false;
+        }
+
+        if (username.Length > 16)
+        {
+            validationError = "Username must be maximum 16 characters long.";
+        }
+        
+        validationError = String.Empty;
+        return true;
+    }
+    
+    private bool IsValidPassword(string password, out string validationError)
+    {
+        string defaultValidationError = "Invalid password.";
+        
+        if (String.IsNullOrEmpty(password) || String.IsNullOrWhiteSpace(password))
+        {
+            validationError = defaultValidationError;
+            return false;
+        }
+
+        if (password.Length < 8)
+        {
+            validationError = "Password must be minimum 8 characters long.";
+            return false;
+        }
+        
+        if (password.Length > 32)
+        {
+            validationError = "Password must be maximum 32 characters long.";
+            return false;
+        }
+
+        var regEx = new Regex("^(?=.*[a-z])(?=.*[A-Z]).{8,}$");
+
+        if (!regEx.IsMatch(password))
+        {
+            validationError = "Password must contain at least 1 upper, 1 lower case letters and 1 number.";
+            return false;
+        }
+
+        validationError = String.Empty;
+        return true;
     }
 }
