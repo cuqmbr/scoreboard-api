@@ -1,4 +1,4 @@
-# scoreboard-api – CRUD API with authetcication and authorization
+# ScoreboardAPI – CRUD API with authetcication and authorization
 
 ## Features
 
