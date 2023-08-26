@@ -9,6 +9,6 @@ jobs:
             fetch-depth: 0
         - uses: yesolutions/mirror-action@master
           with:
-            REMOTE: 'https://git.cuqmbr.xyz/cuqmbr/arch-dots.git'
+            REMOTE: 'https://git.cuqmbr.xyz/cuqmbr/scoreboard-api.git'
             GIT_USERNAME: cuqmbr
             GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
