@@ -10,11 +10,13 @@
 - Update scoreboard record using administarator's account
 - Delete scoreboard record using administartor's account
 
+<!--
 ## Project preview
 
 <div style="display: flex;">
   <img src="http://drive.google.com/uc?export=view&id=1ex5QnARWT0kj3nvmgs55pNKG1eC3vuOP" alt="Search route page" width="50%" border="10" />
-</div>                                                                                                                                          
+</div>
+-->                                                                                                                                      
                                                                                                                                                     
 ## How to install?
 
